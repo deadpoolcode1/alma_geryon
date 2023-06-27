@@ -1,0 +1,17 @@
+menu "Geryon Application"
+
+config SUPPORT_HAL_STM32
+	bool "Enable HAL API for STM32"
+	default y
+	select USE_STM32_HAL_TIM
+	select USE_STM32_HAL_TIM_EX
+	select USE_STM32_HAL_GPIO
+endmenu
+
+menu "Zephyr Kernel"
+source "$ZEPHYR_BASE/Kconfig.zephyr"
+endmenu
+
+module = GERYON_APP
+module-str = Geryon App
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"

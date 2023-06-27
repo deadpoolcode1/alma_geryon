@@ -1,0 +1,3 @@
+config BOARD_GERYON_G071
+	bool "Development Board for Geryon with G071 hardware"
+	depends on SOC_STM32G071XX

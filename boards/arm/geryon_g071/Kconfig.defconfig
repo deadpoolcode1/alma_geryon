@@ -1,0 +1,6 @@
+if BOARD_GERYON_G071
+
+config BOARD
+	default "geryon_g071"
+
+endif # BOARD_GERYON_G071
