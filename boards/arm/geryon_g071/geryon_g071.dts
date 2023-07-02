@@ -43,6 +43,22 @@
 		 };
 	 };
  
+	 pwmleds {
+		compatible = "pwm-leds";
+
+		sync_1: sync_1 {
+			pwms = <&pwm1 2 PWM_USEC(4) PWM_POLARITY_NORMAL>;
+		};
+
+		sync_2: sync_2 {
+			pwms = <&pwm2 1 PWM_USEC(4) PWM_POLARITY_NORMAL>;
+		};
+
+		sync_3: sync_3 {
+			pwms = <&pwm3 3 PWM_USEC(4) PWM_POLARITY_NORMAL>;
+		};
+	};
+
 	 gpio_keys {
 		 compatible = "gpio-keys";
 		 user_button: button {
@@ -55,6 +71,9 @@
 		 led0 = &green_led_1;
 		 sw0 = &user_button;
 		 watchdog0 = &iwdg;
+		 sync-1 = &sync_1;
+		 sync-2 = &sync_2;
+		 sync-3 = &sync_3;
 	 };
  };
  
@@ -107,16 +126,34 @@
 	 status = "okay";
  };
  
- &timers3 {
-	 st,prescaler = <10000>;
-	 status = "okay";
-	 pwm3: pwm {
-		 status = "okay";
-		 pinctrl-0 = <&tim3_ch1_pa6>;
-		 pinctrl-names = "default";
-	 };
- };
+ &timers1 {
+	status = "okay";
+
+	pwm1: pwm {
+		status = "okay";
+		pinctrl-0 = <&tim1_ch2_pb3>;
+		pinctrl-names = "default";
+	};
+};
+
+&timers2 {
+	status = "okay";
+	pwm2: pwm {
+		status = "okay";
+		pinctrl-0 = <&tim2_ch1_pa15>;
+		pinctrl-names = "default";
+	};
+};
  
+&timers3 {
+	status = "okay";
+	pwm3: pwm {
+		status = "okay";
+		pinctrl-0 = <&tim3_ch3_pb0>;
+		pinctrl-names = "default";
+	};
+};
+
  &i2c1 {
 	 pinctrl-0 = <&i2c1_scl_pb8 &i2c1_sda_pb9>;
 	 pinctrl-names = "default";
