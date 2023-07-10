@@ -25,4 +25,8 @@ endif()
 
 configure_file(app_version.h.in ${CMAKE_BINARY_DIR}/app/include/app_version.h)
 
-target_sources(app PRIVATE src/main.c)
+target_sources(app PRIVATE 
+  src/main.c
+  src/pwm.c  
+  src/protocol.c
+)
