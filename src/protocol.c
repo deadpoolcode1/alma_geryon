@@ -4,7 +4,7 @@
 #include <zephyr/device.h>
 #include <zephyr/drivers/uart.h>
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(geryon_uart);
+LOG_MODULE_REGISTER(geryon_uart, LOG_LEVEL_DBG);
 
 #include "protocol.h"
 
@@ -31,7 +31,7 @@ static void proto_hw_rx_callback(const struct device *dev, void *user_data)
 
 static void proto_hw_init(void)
 {
-	g_proto_uart = device_get_binding("UART_1");
+	g_proto_uart = DEVICE_DT_GET(DT_ALIAS(alma_uart));
 	if (!device_is_ready(g_proto_uart)) {
 		LOG_ERR("UART device not found!");
 		return;
@@ -66,9 +66,9 @@ static K_KERNEL_STACK_DEFINE(app_stack, PROTO_STACK_SIZE);
 #define PROTO_START_MSG (0x1B)
 #define PROTO_END_MSG (0x0D)
 #define PROTO_RECV_MAX_SIZE (128)
-#define PROTO_CMD_OFFSET (4)
-#define PROTO_SUB_CMD_OFFSET (5)
-#define PROTO_SUB_CMD_CH_OFFSET (6)
+#define PROTO_CMD_OFFSET (5)
+#define PROTO_SUB_CMD_OFFSET (6)
+#define PROTO_SUB_CMD_CH_OFFSET (7)
 
 typedef void (*proto_res_handler)(uint8_t *buffer, uint8_t len);
 
@@ -184,11 +184,24 @@ static uint16_t protocol_accum_len(struct protocol_info* pInfo)
   return (uint16_t)pInfo->stream_idx;
 }
 
+static char procol_hex_ascii(char hex) {
+    if (hex >= '0' && hex <= '9') {
+        return hex - '0';
+    } else if (hex >= 'A' && hex <= 'F') {
+        return hex - 'A' + 10;
+    } else if (hex >= 'a' && hex <= 'f') {
+        return hex - 'a' + 10;
+    }
+    return -1;  // Invalid hex character
+}
+
 static void protocol_request_parser(void) {
     const uint8_t* pbuf = protocol_accum_buf(&g_proto_info);
     const uint16_t len = protocol_accum_len(&g_proto_info);
-    uint8_t crc = protocol_calc_crc((uint8_t* )pbuf, len - 2);
-    uint8_t recv_crc = (pbuf[len - 1] - '0') * 10 + (pbuf[len] - '0');
+    LOG_HEXDUMP_INF(pbuf, len, "REQUEST");
+    uint8_t crc = protocol_calc_crc((uint8_t* )pbuf, len - 3);
+
+    uint8_t recv_crc = procol_hex_ascii(pbuf[len - 3]) << 4 | procol_hex_ascii(pbuf[len - 2]);
     if (recv_crc != crc) {
         LOG_ERR("Invalid CRC frame 0x%02x - 0x%02x", crc, recv_crc);
         return;
@@ -196,7 +209,7 @@ static void protocol_request_parser(void) {
 
     uint8_t cmd = pbuf[PROTO_CMD_OFFSET];
     uint8_t sub_cmd = pbuf[PROTO_SUB_CMD_OFFSET];
-
+    LOG_INF("0x%02x - 0x%02x", cmd, sub_cmd);
     for (int i = 0; i < PROTO_REQ_CMD_MAX; i++) {
         if (cmd == proto_req_cmd_list[i].cmd && sub_cmd == proto_req_cmd_list[i].sub_cmd) {
             if (proto_req_cmd_list[i].handler != NULL) {
@@ -232,6 +245,7 @@ void protocol_init(void) {
 }
 
 static void proto_req_cmd_set_freq_handler(uint8_t *buffer, uint8_t len) {
+    LOG_INF("Set frequency");
     uint8_t freq = buffer[7] - '0';
     if (freq < 1 || freq > 10) {
         LOG_ERR("Frequency is wrong");
@@ -243,6 +257,7 @@ static void proto_req_cmd_set_freq_handler(uint8_t *buffer, uint8_t len) {
 }
 
 static void proto_req_cmd_get_freq_handler(uint8_t *buffer, uint8_t len) {
+    LOG_INF("Get frequency");
     uint8_t res_buf[128] = {0x00};
     uint8_t offset = 0;
     res_buf[offset++] = 0x1B;
@@ -257,11 +272,12 @@ static void proto_req_cmd_get_freq_handler(uint8_t *buffer, uint8_t len) {
     res_buf[offset++] = (crc / 10) + '0';
     res_buf[offset++] = (crc % 10) + '0';
     res_buf[offset++] = 0x0D;
+    LOG_HEXDUMP_INF(res_buf, offset, "GET_FREQ");
     proto_hw_send(res_buf, offset);
 }
 
 static void proto_req_cmd_set_duty_handler(uint8_t *buffer, uint8_t len) {
-    uint8_t duty = (buffer[7] - '0') * 10 + (buffer[8] - '0');
+    uint8_t duty = procol_hex_ascii(buffer[8]) * 10  + procol_hex_ascii(buffer[9]);
     uint8_t channel = buffer[PROTO_SUB_CMD_CH_OFFSET] - '0';
     if (duty < 19 || duty > 30) {
         LOG_ERR("Duty is wrong %d", duty);
@@ -300,7 +316,7 @@ static void proto_req_cmd_get_duty_handler(uint8_t *buffer, uint8_t len) {
 }
 
 static void proto_req_cmd_set_current_handler(uint8_t *buffer, uint8_t len) {
-    uint8_t current = (buffer[7] - '0') * 10 + (buffer[8] - '0');
+    uint8_t current = procol_hex_ascii(buffer[8]) * 10  + procol_hex_ascii(buffer[9]);
     uint8_t channel = buffer[PROTO_SUB_CMD_CH_OFFSET] - '0';
     if (current < 10 || current > 90) {
         LOG_ERR("Current is wrong %d", current);
@@ -361,7 +377,7 @@ static void proto_req_cmd_set_drv_pulse_mode_handler(uint8_t *buffer, uint8_t le
 }
 
 static void proto_req_cmd_set_sync_freq_handler(uint8_t *buffer, uint8_t len) {
-    uint8_t sync_freq = (buffer[7] - '0') * 100 + (buffer[8] - '0') * 10 + (buffer[9] - '0');
+    uint16_t sync_freq = procol_hex_ascii(buffer[7]) * 100 + procol_hex_ascii(buffer[8]) * 10 + procol_hex_ascii(buffer[9]);
     if (sync_freq > 300 || sync_freq < 250) {
         LOG_ERR("Sync Freq is wrong %d", sync_freq);
         return;
