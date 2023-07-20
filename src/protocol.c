@@ -456,6 +456,10 @@ static void proto_req_cmd_set_fan_operation_handler(uint8_t *buffer,
   }
 
   p_proto_data->fan_operation = fan;
+  if (fan)
+	io_set(IO_PULSE1_OUT, 1);
+  else
+	io_set(IO_PULSE1_OUT, 0);
   LOG_DBG("Fan operation is set %d", fan);
 }
 
