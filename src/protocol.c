@@ -8,6 +8,7 @@
 LOG_MODULE_REGISTER(geryon_uart, LOG_LEVEL_DBG);
 
 #include "protocol.h"
+#include "main.h"
 
 extern struct alma_data global_alma_data;
 
