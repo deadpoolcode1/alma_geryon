@@ -9,6 +9,8 @@ LOG_MODULE_REGISTER(geryon_uart, LOG_LEVEL_DBG);
 
 #include "protocol.h"
 
+extern struct alma_data global_alma_data;
+
 static const struct device *g_proto_uart = NULL;
 K_MSGQ_DEFINE(g_proto_uart_queue, 1, 4096, 4);
 
@@ -271,6 +273,11 @@ void protocol_thread_handler(void) {
 void protocol_init(void) {
   proto_hw_init();
 
+	p_proto_data->sync_freq = global_alma_data.sync_freq;
+  p_proto_data->jitter_value = global_alma_data.jitter;
+  p_proto_data->operation = global_alma_data.op_mode;
+  p_proto_data->drive_pulse_mode = global_alma_data.pulse_mode;
+
   thread_protocol_id = k_thread_create(
       &protocol_thread, app_stack, K_KERNEL_STACK_SIZEOF(app_stack),
       (k_thread_entry_t)protocol_thread_handler, NULL, NULL, NULL,
@@ -396,6 +403,7 @@ static void proto_req_cmd_set_operation_handler(uint8_t *buffer, uint8_t len) {
   }
 
   p_proto_data->operation = operation;
+  global_alma_data.op_mode = operation;
   LOG_DBG("Operation is set %d", operation);
 }
 
@@ -408,6 +416,7 @@ static void proto_req_cmd_set_drv_pulse_mode_handler(uint8_t *buffer,
   }
 
   p_proto_data->drive_pulse_mode = drv_pulse;
+  global_alma_data.pulse_mode = drv_pulse;
   LOG_DBG("Driver Pulse is set %d", drv_pulse);
 }
 
@@ -421,6 +430,7 @@ static void proto_req_cmd_set_sync_freq_handler(uint8_t *buffer, uint8_t len) {
   }
 
   p_proto_data->sync_freq = sync_freq;
+  global_alma_data.sync_freq = sync_freq;
   LOG_DBG("Sync Frequency is set %d", sync_freq);
 }
 
@@ -432,6 +442,7 @@ static void proto_req_cmd_set_jitter_handler(uint8_t *buffer, uint8_t len) {
   }
 
   p_proto_data->jitter_value = jitter;
+  global_alma_data.jitter = jitter;
   LOG_DBG("Jitter is set %d", jitter);
 }
 
