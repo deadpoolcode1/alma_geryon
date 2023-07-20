@@ -47,6 +47,19 @@ struct proto_data {
     uint8_t error;
 };
 
+enum proto_error_message {
+    COMM_ERR = 0,
+    OT_ERR = 1,
+    FLT_ERR = 2,
+    OC1_ERR = 3,
+    OC2_ERR = 4,
+    OV1_ERR = 5,
+    OV2_ERR = 6,
+};
+
 void protocol_init(void);
+void protocol_enable_rx(void);
+void protocol_disable_rx(void);
+void protop_send_error_message(uint8_t error);
 
 #endif /* PROTOCOL_H_ */

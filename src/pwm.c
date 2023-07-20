@@ -252,6 +252,18 @@ void pwm_init(void) {
   htim3.Instance->CCR3 = 0;
 }
 
+void pwm_start(void) {
+  htim1.Instance->CCR2 = 5;
+  htim2.Instance->CCR1 = 5;
+  htim3.Instance->CCR3 = 5;
+}
+
+void pwm_stop(void) {
+  htim1.Instance->CCR2 = 0;
+  htim2.Instance->CCR1 = 0;
+  htim3.Instance->CCR3 = 0;
+}
+
 void jitter_work_handler(struct k_work *work) {
   if (current_jitter == 0) {
     return;

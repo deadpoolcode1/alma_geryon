@@ -29,4 +29,9 @@ target_sources(app PRIVATE
   src/main.c
   src/pwm.c  
   src/protocol.c
+  src/io.c
+  src/app_event_manager.c
+  src/cset.c
+  src/cmon.c
+  src/mcp466.c
 )
