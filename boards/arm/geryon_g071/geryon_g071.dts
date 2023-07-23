@@ -128,12 +128,12 @@
 		};
 		pulse1_out: pulse1-out {
 			compatible = "alma,output";
-			control-gpios = <&gpiod 2 GPIO_ACTIVE_HIGH>;
+			control-gpios = <&gpiod 3 GPIO_ACTIVE_HIGH>;
 			status = "okay";
 		};
 		pwm1_out: pwm1-out {
 			compatible = "alma,output";
-			control-gpios = <&gpiod 3 GPIO_ACTIVE_HIGH>;
+			control-gpios = <&gpiod 2 GPIO_ACTIVE_HIGH>;
 			status = "okay";
 		};
 		oc1_int: oc1-int {

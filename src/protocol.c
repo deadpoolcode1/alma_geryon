@@ -9,6 +9,7 @@ LOG_MODULE_REGISTER(geryon_uart, LOG_LEVEL_DBG);
 
 #include "protocol.h"
 #include "main.h"
+#include "io.h"
 
 extern struct alma_data global_alma_data;
 
@@ -457,9 +458,9 @@ static void proto_req_cmd_set_fan_operation_handler(uint8_t *buffer,
 
   p_proto_data->fan_operation = fan;
   if (fan)
-	io_set(IO_PULSE1_OUT, 1);
+	io_set(IO_FAN_OUT, 1);
   else
-	io_set(IO_PULSE1_OUT, 0);
+	io_set(IO_FAN_OUT, 0);
   LOG_DBG("Fan operation is set %d", fan);
 }
 
