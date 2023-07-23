@@ -34,4 +34,6 @@ target_sources(app PRIVATE
   src/cset.c
   src/cmon.c
   src/mcp466.c
+  src/pwm_gpio.c
+  src/common.c
 )

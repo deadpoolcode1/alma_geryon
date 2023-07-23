@@ -295,6 +295,7 @@ static void proto_req_cmd_set_freq_handler(uint8_t *buffer, uint8_t len) {
   }
 
   p_proto_data->freq = freq;
+  global_alma_data.pulse_freq = freq;
   LOG_DBG("Frequency is set %d", freq);
 }
 
@@ -332,6 +333,7 @@ static void proto_req_cmd_set_duty_handler(uint8_t *buffer, uint8_t len) {
   }
 
   p_proto_data->duty[channel] = duty;
+  global_alma_data.pulse_dc[channel] = duty;
   LOG_DBG("Duty channel %d is set %d", channel, duty);
 }
 

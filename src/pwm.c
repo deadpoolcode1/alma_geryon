@@ -5,10 +5,12 @@
 #include <zephyr/device.h>
 #include <zephyr/drivers/pwm.h>
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(geryon_pwm);
-
+#include "common.h"
 #include<math.h>
 #include <zephyr/random/rand32.h>
+
+LOG_MODULE_REGISTER(geryon_pwm);
+
 
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
@@ -293,7 +295,7 @@ void jitter_work_handler(struct k_work *work) {
 }
 
 static int cmd_set_jitter(const struct shell *shell, size_t argc, char **argv) {
-  int jitter = atoi(argv[1]);
+  int jitter = custom_atoi(argv[1]);
   if (jitter >= 10 || jitter <= -10) {
     shell_error(shell, "Invalid jitter parameter");
     return 0;
@@ -310,7 +312,7 @@ static int cmd_set_jitter(const struct shell *shell, size_t argc, char **argv) {
 }
 
 static int cmd_set_pulse(const struct shell *shell, size_t argc, char **argv) {
-  int input = atoi(argv[1]);
+  int input = custom_atoi(argv[1]);
 
   int pulse = input * (current_period) / 100;
   LOG_INF("Pulse %d", pulse);
@@ -322,7 +324,7 @@ static int cmd_set_pulse(const struct shell *shell, size_t argc, char **argv) {
 }
 
 static int cmd_set_freq(const struct shell *shell, size_t argc, char **argv) {
-  int new_freq = atoi(argv[1]);
+  int new_freq = custom_atoi(argv[1]);
   float _temp = (float)(base_freq * (current_psc)) / (float)new_freq;
   int new_psc_1 = (int)(_temp + 0.5);
   _temp = (float)(base_freq * (current_psc)) / (float)new_freq;
