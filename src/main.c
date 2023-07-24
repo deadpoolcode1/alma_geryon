@@ -79,6 +79,7 @@ void main_opmode_1_flow(void) {
     pin_gpios[0] = IO_PWM1_OUT;
   }
 
+  stop_pwm_pins(pin_gpios, num_pins);
   start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins, -1);
   io_set(IO_STATE1_OUT, 0);
   io_set(IO_STATE2_OUT, 0);
@@ -101,6 +102,7 @@ void main_opmode_2_flow(void) {
     pin_gpios[0] = IO_PWM2_OUT;
   }
 
+  stop_pwm_pins(pin_gpios, num_pins);
   start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins, -1);
   io_set(IO_STATE1_OUT, 0);
   io_set(IO_STATE2_OUT, 0);
@@ -128,6 +130,8 @@ void main_opmode_3_flow(void) {
     pin_gpios[0] = IO_PWM1_OUT;
     pin_gpios[1] = IO_PWM2_OUT;
   }
+
+  stop_pwm_pins(pin_gpios, num_pins);
   start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins, -1);
   io_set(IO_STATE1_OUT, 0);
   io_set(IO_STATE2_OUT, 0);
@@ -154,6 +158,8 @@ void main_opmode_4_flow(void) {
     pin_gpios[0] = IO_PWM1_OUT;
     pin_gpios[1] = IO_PWM2_OUT;
   }
+
+  stop_pwm_pins(pin_gpios, num_pins);
   start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins, 1);
   io_set(IO_STATE1_OUT, 1);
   io_set(IO_STATE2_OUT, 1);
