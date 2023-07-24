@@ -5,7 +5,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/printk.h>
 
-LOG_MODULE_REGISTER(geryon_uart, LOG_LEVEL_ERR);
+LOG_MODULE_REGISTER(geryon_uart, LOG_LEVEL_DBG);
 
 #include "protocol.h"
 #include "main.h"
@@ -288,7 +288,13 @@ void protocol_init(void) {
 
 static void proto_req_cmd_set_freq_handler(uint8_t *buffer, uint8_t len) {
   LOG_DBG("Set frequency");
-  uint8_t freq = buffer[7] - '0';
+  uint8_t freq = 0;
+  if (buffer[4] == '1') {
+    freq = procol_hex_ascii(buffer[7]);
+  } else {
+    freq = procol_hex_ascii(buffer[7]) * 10 + procol_hex_ascii(buffer[8]);
+  }
+
   if (freq < 1 || freq > 10) {
     LOG_DBG("Frequency is wrong");
     return;
@@ -307,10 +313,20 @@ static void proto_req_cmd_get_freq_handler(uint8_t *buffer, uint8_t len) {
   res_buf[offset++] = '0';
   res_buf[offset++] = '0';
   res_buf[offset++] = '0';
-  res_buf[offset++] = '1';
+  if (global_alma_data.pulse_freq == 10) {
+    res_buf[offset++] = '2';
+  } else {
+    res_buf[offset++] = '1';
+  }
   res_buf[offset++] = 'G';
   res_buf[offset++] = 'F';
-  res_buf[offset++] = global_alma_data.pulse_freq + '0';
+  if (global_alma_data.pulse_freq >= 10) {
+    res_buf[offset++] = (global_alma_data.pulse_freq / 10) + '0';
+    res_buf[offset++] = (global_alma_data.pulse_freq % 10) + '0';
+  } else {
+    res_buf[offset++] = global_alma_data.pulse_freq + '0';
+  }
+  
   uint8_t crc = protocol_calc_crc(res_buf, offset);
   res_buf[offset++] = (crc / 10) + '0';
   res_buf[offset++] = (crc % 10) + '0';
@@ -320,7 +336,13 @@ static void proto_req_cmd_get_freq_handler(uint8_t *buffer, uint8_t len) {
 }
 
 static void proto_req_cmd_set_duty_handler(uint8_t *buffer, uint8_t len) {
-  uint8_t duty = procol_hex_ascii(buffer[8]) * 10 + procol_hex_ascii(buffer[9]);
+  uint8_t duty = 0;
+  if (buffer[4] == '1') {
+    duty = procol_hex_ascii(buffer[8]);
+  } else {
+    duty = procol_hex_ascii(buffer[8]) * 10 + procol_hex_ascii(buffer[9]);
+  }
+
   uint8_t channel = buffer[PROTO_SUB_CMD_CH_OFFSET] - '0';
   if (duty < 9 || duty > 30) {
     LOG_ERR("Duty is wrong %d", duty);
@@ -346,12 +368,22 @@ static void proto_req_cmd_get_duty_handler(uint8_t *buffer, uint8_t len) {
   res_buf[offset++] = '0';
   res_buf[offset++] = '0';
   res_buf[offset++] = '0';
-  res_buf[offset++] = '2';
+  if (duty < 10) {
+    res_buf[offset++] = '1';
+  } else {
+    res_buf[offset++] = '2';
+  }
+  
   res_buf[offset++] = 'G';
   res_buf[offset++] = 'D';
   res_buf[offset++] = channel + '0';
-  res_buf[offset++] = (duty / 10) + '0';
-  res_buf[offset++] = (duty % 10) + '0';
+  if (duty < 10) {
+    res_buf[offset++] = (duty) + '0';
+  } else {
+    res_buf[offset++] = (duty / 10) + '0';
+    res_buf[offset++] = (duty % 10) + '0';
+  }
+
   uint8_t crc = protocol_calc_crc(res_buf, offset);
   res_buf[offset++] = (crc / 10) + '0';
   res_buf[offset++] = (crc % 10) + '0';
@@ -538,7 +570,7 @@ void protop_send_error_message(uint8_t error) {
   res_buf[offset++] = (crc / 10) + '0';
   res_buf[offset++] = (crc % 10) + '0';
   res_buf[offset++] = 0x0D;
-  proto_hw_send(res_buf, offset);
+  // proto_hw_send(res_buf, offset);
 }
 
 void protocol_enable_rx(void) { uart_irq_rx_enable(g_proto_uart); }
