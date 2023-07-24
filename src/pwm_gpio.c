@@ -1,6 +1,7 @@
 #include <zephyr/device.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/kernel.h>
+#include <stdbool.h>
 #include "io.h"
 #include "cset.h"
 
@@ -22,6 +23,8 @@ struct pwm_pin_state {
     uint8_t pin_gpio;
     uint32_t period;
     uint32_t pulse_width;
+    bool is_start;
+    bool is_init;
     struct k_timer pwm_timer_high; // Timer for PWM pin high duration
     struct k_timer pwm_timer_low;  // Timer for PWM pin low duration
 };
@@ -72,8 +75,13 @@ void start_pwm_pins(uint8_t *pin_gpios, uint8_t *freqs, uint8_t *duty_cycles, ui
         pin_state->period = period_ms;
         pin_state->pulse_width = pulse_width_ms;
         pwm_timer_index_shift = index_shift;
-        k_timer_init(&pin_state->pwm_timer_high, pwm_high_callback, NULL);
-        k_timer_init(&pin_state->pwm_timer_low, pwm_low_callback, NULL);
+        pin_state->is_start = true;
+        if (pin_state->is_init == false) {
+            pin_state->is_init = true;
+            k_timer_init(&pin_state->pwm_timer_high, pwm_high_callback, NULL);
+            k_timer_init(&pin_state->pwm_timer_low, pwm_low_callback, NULL);
+        }
+
         io_set(pin_state->pin_gpio, 0); // Set the PWM pin low initially
         if (i == index_shift) {
             k_timer_start(&pwm_timer_shift, K_MSEC(pin_state->period / 2 - pin_state->pulse_width / 2), K_NO_WAIT);
@@ -93,8 +101,12 @@ void stop_pwm_pins(uint8_t *pin_gpios, uint8_t num_pins)
     for (uint8_t i = 0; i < num_pins; i++) {
         uint8_t pin_gpio = pin_gpios[i];
         struct pwm_pin_state *pin_state = &pwm_pins[pin_gpio];
-        k_timer_stop(&pin_state->pwm_timer_high);
-        k_timer_stop(&pin_state->pwm_timer_low);
+        if (pin_state->is_start) {
+            pin_state->is_start = false;
+            k_timer_stop(&pin_state->pwm_timer_high);
+            k_timer_stop(&pin_state->pwm_timer_low);
+        }
+
         m_io_set(pin_state->pin_gpio, 0); // Set the PWM pin low
 
         LOG_INF("Stopped PWM on pin %u", pin_gpio);
