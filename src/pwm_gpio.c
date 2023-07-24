@@ -26,25 +26,34 @@ struct pwm_pin_state {
     struct k_timer pwm_timer_low;  // Timer for PWM pin low duration
 };
 
+static void pwm_timer_shift_callback(struct k_timer *timer_id);
+static int8_t pwm_timer_index_shift = 0;
+K_TIMER_DEFINE(pwm_timer_shift, pwm_timer_shift_callback, NULL);
+
 static struct pwm_pin_state pwm_pins[MAX_NUM_PWM_PINS];
 
 #define CONTAINER_OF_TIMER(ptr, type, field) ((type *)((char *)(ptr) - offsetof(type, field)))
 
-void pwm_high_callback(struct k_timer *timer_id)
+static void pwm_timer_shift_callback(struct k_timer *timer_id) {
+    struct pwm_pin_state *pin_state = &pwm_pins[pwm_timer_index_shift];
+    k_timer_start(&pin_state->pwm_timer_high, K_MSEC(0), K_NO_WAIT);
+}
+
+static void pwm_high_callback(struct k_timer *timer_id)
 {
     struct pwm_pin_state *pin_state = CONTAINER_OF_TIMER(timer_id, struct pwm_pin_state, pwm_timer_high);
     m_io_set(pin_state->pin_gpio, 0); // Set the PWM pin low
     k_timer_start(&pin_state->pwm_timer_low, K_MSEC(pin_state->period - pin_state->pulse_width), K_NO_WAIT);
 }
 
-void pwm_low_callback(struct k_timer *timer_id)
+static void pwm_low_callback(struct k_timer *timer_id)
 {
     struct pwm_pin_state *pin_state = CONTAINER_OF_TIMER(timer_id, struct pwm_pin_state, pwm_timer_low);
     m_io_set(pin_state->pin_gpio, 1); // Set the PWM pin high
     k_timer_start(&pin_state->pwm_timer_high, K_MSEC(pin_state->pulse_width), K_NO_WAIT);
 }
 
-void start_pwm_pins(uint8_t *pin_gpios, uint8_t *freqs, uint8_t *duty_cycles, uint8_t num_pins)
+void start_pwm_pins(uint8_t *pin_gpios, uint8_t *freqs, uint8_t *duty_cycles, uint8_t num_pins, int8_t index_shift)
 {
     if (num_pins > MAX_NUM_PWM_PINS) {
         return;
@@ -62,13 +71,15 @@ void start_pwm_pins(uint8_t *pin_gpios, uint8_t *freqs, uint8_t *duty_cycles, ui
         pin_state->pin_gpio = pin_gpio;
         pin_state->period = period_ms;
         pin_state->pulse_width = pulse_width_ms;
-
+        pwm_timer_index_shift = index_shift;
         k_timer_init(&pin_state->pwm_timer_high, pwm_high_callback, NULL);
         k_timer_init(&pin_state->pwm_timer_low, pwm_low_callback, NULL);
         io_set(pin_state->pin_gpio, 0); // Set the PWM pin low initially
-
-        k_timer_start(&pin_state->pwm_timer_high, K_MSEC(0), K_NO_WAIT);
-
+        if (i == index_shift) {
+            k_timer_start(&pwm_timer_shift, K_MSEC(pin_state->period / 2 - pin_state->pulse_width / 2), K_NO_WAIT);
+        } else {
+            k_timer_start(&pin_state->pwm_timer_high, K_MSEC(0), K_NO_WAIT);
+        }
         LOG_INF("Started PWM on pin %u with freq %u Hz and duty cycle %u%%", pin_gpio, freq, duty_cycle);
     }
 }

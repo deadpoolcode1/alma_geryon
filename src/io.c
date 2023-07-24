@@ -41,7 +41,9 @@ static struct gpio_callback oc1_int_cb;
 static struct gpio_callback ov1_int_cb;
 
 static void global_en_callback_handler(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins) {
+	struct app_event event;
 	uint8_t level = gpio_pin_get_dt(&global_en_dt);
+	LOG_DBG("Level %d", level);
 	if (level == 0) {
 		event.type = APP_EVENT_IN_GLOBAL_EN_FALLING;
 	} else if (level == 1) {

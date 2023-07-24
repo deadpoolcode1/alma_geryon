@@ -79,7 +79,7 @@ void main_opmode_1_flow(void) {
     pin_gpios[0] = IO_PWM1_OUT;
   }
 
-  start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins);
+  start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins, -1);
   io_set(IO_STATE1_OUT, 0);
   io_set(IO_STATE2_OUT, 0);
   io_set(IO_STATE2_OUT, 0);
@@ -101,7 +101,7 @@ void main_opmode_2_flow(void) {
     pin_gpios[0] = IO_PWM2_OUT;
   }
 
-  start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins);
+  start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins, -1);
   io_set(IO_STATE1_OUT, 0);
   io_set(IO_STATE2_OUT, 0);
   io_set(IO_STATE2_OUT, 0);
@@ -112,17 +112,23 @@ void main_opmode_3_flow(void) {
   io_set(IO_PULSE2_OUT, 1);
   io_set(IO_DRV_EN1_OUT, 1);
   io_set(IO_DRV_EN2_OUT, 1);
+  freqs[0] = global_alma_data.pulse_freq;
+  freqs[1] = global_alma_data.pulse_freq;
+  duty_cycles[0] = global_alma_data.pulse_dc[0];
+  duty_cycles[1] = global_alma_data.pulse_dc[1];
+  num_pins = 2;
   if (global_alma_data.pulse_mode == 1) {
-    cset_out(CSET_CH_1, 128);
-    cset_out(CSET_CH_2, 128);
+    pin_gpios[0] = CSET_CH_1;
+    pin_gpios[1] = CSET_CH_2;
     io_set(IO_PWM1_OUT, 1);
     io_set(IO_PWM2_OUT, 1);
   } else if (global_alma_data.pulse_mode == 0) {
     cset_out(CSET_CH_1, 128);
     cset_out(CSET_CH_2, 128);
-    io_set(IO_PWM1_OUT, 1);
-    io_set(IO_PWM2_OUT, 1);
+    pin_gpios[0] = IO_PWM1_OUT;
+    pin_gpios[1] = IO_PWM2_OUT;
   }
+  start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins, -1);
   io_set(IO_STATE1_OUT, 0);
   io_set(IO_STATE2_OUT, 0);
   io_set(IO_STATE2_OUT, 1);
@@ -133,17 +139,22 @@ void main_opmode_4_flow(void) {
   io_set(IO_PULSE2_OUT, 1);
   io_set(IO_DRV_EN1_OUT, 1);
   io_set(IO_DRV_EN2_OUT, 1);
+  freqs[0] = global_alma_data.pulse_freq;
+  freqs[1] = global_alma_data.pulse_freq;
+  duty_cycles[0] = global_alma_data.pulse_dc[0];
+  duty_cycles[1] = global_alma_data.pulse_dc[1];
   if (global_alma_data.pulse_mode == 1) {
-    cset_out(CSET_CH_1, 128);
-    cset_out(CSET_CH_2, 128);
+    pin_gpios[0] = CSET_CH_1;
+    pin_gpios[1] = CSET_CH_2;
     io_set(IO_PWM1_OUT, 1);
     io_set(IO_PWM2_OUT, 1);
   } else if (global_alma_data.pulse_mode == 0) {
     cset_out(CSET_CH_1, 128);
     cset_out(CSET_CH_2, 128);
-    io_set(IO_PWM1_OUT, 1);
-    io_set(IO_PWM2_OUT, 1);
+    pin_gpios[0] = IO_PWM1_OUT;
+    pin_gpios[1] = IO_PWM2_OUT;
   }
+  start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins, 1);
   io_set(IO_STATE1_OUT, 1);
   io_set(IO_STATE2_OUT, 1);
   io_set(IO_STATE2_OUT, 0);
