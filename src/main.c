@@ -198,6 +198,12 @@ void main(void) {
       LOG_INF("APP_EVENT_IN_GLOBAL_EN_FALLING");
       /* Stop pusle flow */
       pwm_stop();
+      num_pins = 4;
+      pin_gpios[0] = CSET_CH_1;
+      pin_gpios[1] = CSET_CH_2;
+      pin_gpios[3] = IO_PWM1_OUT;
+      pin_gpios[4] = IO_PWM2_OUT;
+      stop_pwm_pins(pin_gpios, num_pins);
       io_set(IO_RS232_EN_OUT, 0); // Enable RS232
       break;
     }
