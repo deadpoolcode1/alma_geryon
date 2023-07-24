@@ -52,6 +52,12 @@ void main_init_flow(void) {
 }
 
 void main_close_laser_flow(void) {
+  pin_gpios[0] = IO_PWM1_OUT;
+  pin_gpios[1] = IO_PWM2_OUT;
+  pin_gpios[2] = CSET_CH_1;
+  pin_gpios[3] = CSET_CH_2;
+  num_pins = 4;
+  stop_pwm_pins(pin_gpios, num_pins);
   io_set(IO_PWM1_OUT, 0);
   io_set(IO_PWM2_OUT, 0);
   cset_out(CSET_CH_1, 0);
