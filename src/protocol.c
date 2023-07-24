@@ -322,8 +322,8 @@ static void proto_req_cmd_get_freq_handler(uint8_t *buffer, uint8_t len) {
 static void proto_req_cmd_set_duty_handler(uint8_t *buffer, uint8_t len) {
   uint8_t duty = procol_hex_ascii(buffer[8]) * 10 + procol_hex_ascii(buffer[9]);
   uint8_t channel = buffer[PROTO_SUB_CMD_CH_OFFSET] - '0';
-  if (duty < 19 || duty > 30) {
-    LOG_DBG("Duty is wrong %d", duty);
+  if (duty < 9 || duty > 30) {
+    LOG_ERR("Duty is wrong %d", duty);
     return;
   }
 
@@ -341,7 +341,7 @@ static void proto_req_cmd_get_duty_handler(uint8_t *buffer, uint8_t len) {
   uint8_t res_buf[128] = {0x00};
   uint8_t offset = 0;
   uint8_t channel = buffer[PROTO_SUB_CMD_CH_OFFSET] - '0';
-  uint8_t duty = p_proto_data->duty[channel];
+  uint8_t duty =  global_alma_data.pulse_dc[channel];
   res_buf[offset++] = 0x1B;
   res_buf[offset++] = '0';
   res_buf[offset++] = '0';

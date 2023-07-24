@@ -18,7 +18,7 @@ LOG_MODULE_REGISTER(geryon_main);
 struct alma_data global_alma_data = {.sync_freq = 250000,
                                      .jitter = 1,
                                      .pulse_freq = 10,
-                                     .pulse_dc = {5, 5},
+                                     .pulse_dc = {10, 10},
                                      .op_mode = 1,
                                      .pulse_mode = 0};
 
