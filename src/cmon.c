@@ -7,7 +7,7 @@
 #include <zephyr/sys/util.h>
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(adc_alma, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(adc_alma, LOG_LEVEL_ERR);
 
 #if !DT_NODE_EXISTS(DT_PATH(zephyr_user)) || \
 	!DT_NODE_HAS_PROP(DT_PATH(zephyr_user), io_channels)

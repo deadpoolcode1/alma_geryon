@@ -5,7 +5,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/printk.h>
 
-LOG_MODULE_REGISTER(geryon_uart, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(geryon_uart, LOG_LEVEL_ERR);
 
 #include "protocol.h"
 #include "main.h"
@@ -237,13 +237,13 @@ static void protocol_request_parser(void) {
   uint8_t recv_crc =
       procol_hex_ascii(pbuf[len - 3]) << 4 | procol_hex_ascii(pbuf[len - 2]);
   if (recv_crc != crc) {
-    LOG_ERR("Invalid CRC frame 0x%02x - 0x%02x", crc, recv_crc);
+    LOG_DBG("Invalid CRC frame 0x%02x - 0x%02x", crc, recv_crc);
     return;
   }
 
   uint8_t cmd = pbuf[PROTO_CMD_OFFSET];
   uint8_t sub_cmd = pbuf[PROTO_SUB_CMD_OFFSET];
-  LOG_INF("0x%02x - 0x%02x", cmd, sub_cmd);
+  LOG_DBG("0x%02x - 0x%02x", cmd, sub_cmd);
   for (int i = 0; i < PROTO_REQ_CMD_MAX; i++) {
     if (cmd == proto_req_cmd_list[i].cmd &&
         sub_cmd == proto_req_cmd_list[i].sub_cmd) {
@@ -287,10 +287,10 @@ void protocol_init(void) {
 }
 
 static void proto_req_cmd_set_freq_handler(uint8_t *buffer, uint8_t len) {
-  LOG_INF("Set frequency");
+  LOG_DBG("Set frequency");
   uint8_t freq = buffer[7] - '0';
   if (freq < 1 || freq > 10) {
-    LOG_ERR("Frequency is wrong");
+    LOG_DBG("Frequency is wrong");
     return;
   }
 
@@ -300,7 +300,7 @@ static void proto_req_cmd_set_freq_handler(uint8_t *buffer, uint8_t len) {
 }
 
 static void proto_req_cmd_get_freq_handler(uint8_t *buffer, uint8_t len) {
-  LOG_INF("Get frequency");
+  LOG_DBG("Get frequency");
   uint8_t res_buf[128] = {0x00};
   uint8_t offset = 0;
   res_buf[offset++] = 0x1B;
@@ -323,12 +323,12 @@ static void proto_req_cmd_set_duty_handler(uint8_t *buffer, uint8_t len) {
   uint8_t duty = procol_hex_ascii(buffer[8]) * 10 + procol_hex_ascii(buffer[9]);
   uint8_t channel = buffer[PROTO_SUB_CMD_CH_OFFSET] - '0';
   if (duty < 19 || duty > 30) {
-    LOG_ERR("Duty is wrong %d", duty);
+    LOG_DBG("Duty is wrong %d", duty);
     return;
   }
 
   if (channel > SYNC_MAX_CH) {
-    LOG_ERR("Channel is wrong %d", channel);
+    LOG_DBG("Channel is wrong %d", channel);
     return;
   }
 
@@ -364,12 +364,12 @@ static void proto_req_cmd_set_current_handler(uint8_t *buffer, uint8_t len) {
       procol_hex_ascii(buffer[8]) * 10 + procol_hex_ascii(buffer[9]);
   uint8_t channel = buffer[PROTO_SUB_CMD_CH_OFFSET] - '0';
   if (current < 10 || current > 90) {
-    LOG_ERR("Current is wrong %d", current);
+    LOG_DBG("Current is wrong %d", current);
     return;
   }
 
   if (channel > SYNC_MAX_CH) {
-    LOG_ERR("Channel is wrong %d", channel);
+    LOG_DBG("Channel is wrong %d", channel);
     return;
   }
 
@@ -402,7 +402,7 @@ static void proto_req_cmd_get_current_handler(uint8_t *buffer, uint8_t len) {
 static void proto_req_cmd_set_operation_handler(uint8_t *buffer, uint8_t len) {
   uint8_t operation = buffer[7] - '0';
   if (operation > 4) {
-    LOG_ERR("Operation is wrong %d", operation);
+    LOG_DBG("Operation is wrong %d", operation);
     return;
   }
 
@@ -415,7 +415,7 @@ static void proto_req_cmd_set_drv_pulse_mode_handler(uint8_t *buffer,
                                                      uint8_t len) {
   uint8_t drv_pulse = buffer[7] - '0';
   if (drv_pulse > 2) {
-    LOG_ERR("Driver Pulse is wrong %d", drv_pulse);
+    LOG_DBG("Driver Pulse is wrong %d", drv_pulse);
     return;
   }
 
@@ -429,7 +429,7 @@ static void proto_req_cmd_set_sync_freq_handler(uint8_t *buffer, uint8_t len) {
                        procol_hex_ascii(buffer[8]) * 10 +
                        procol_hex_ascii(buffer[9]);
   if (sync_freq > 300 || sync_freq < 250) {
-    LOG_ERR("Sync Freq is wrong %d", sync_freq);
+    LOG_DBG("Sync Freq is wrong %d", sync_freq);
     return;
   }
 
@@ -441,7 +441,7 @@ static void proto_req_cmd_set_sync_freq_handler(uint8_t *buffer, uint8_t len) {
 static void proto_req_cmd_set_jitter_handler(uint8_t *buffer, uint8_t len) {
   uint8_t jitter = (buffer[7] - '0');
   if (jitter > 5) {
-    LOG_ERR("Jitter is wrong %d", jitter);
+    LOG_DBG("Jitter is wrong %d", jitter);
     return;
   }
 
@@ -454,7 +454,7 @@ static void proto_req_cmd_set_fan_operation_handler(uint8_t *buffer,
                                                     uint8_t len) {
   uint8_t fan = (buffer[7] - '0');
   if (fan != 0 && fan != 1) {
-    LOG_ERR("Fan operation is wrong %d", fan);
+    LOG_DBG("Fan operation is wrong %d", fan);
     return;
   }
 

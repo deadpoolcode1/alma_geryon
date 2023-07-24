@@ -285,7 +285,7 @@ void jitter_work_handler(struct k_work *work) {
   _temp = (float)(base_freq * (current_psc)) / (float)freq_sync3;
   int new_psc_3 = (int)(_temp + 0.5);
 
-  LOG_INF("Freq %d (%d) %d (%d) %d (%d)", freq_sync1, new_psc_1, freq_sync2,
+  LOG_DBG("Freq %d (%d) %d (%d) %d (%d)", freq_sync1, new_psc_1, freq_sync2,
           new_psc_2, freq_sync3, new_psc_3);
 
   htim1.Instance->PSC = new_psc_1;
@@ -315,7 +315,7 @@ static int cmd_set_pulse(const struct shell *shell, size_t argc, char **argv) {
   int input = custom_atoi(argv[1]);
 
   int pulse = input * (current_period) / 100;
-  LOG_INF("Pulse %d", pulse);
+  LOG_DBG("Pulse %d", pulse);
   htim1.Instance->CCR2 = pulse;
   htim2.Instance->CCR1 = pulse;
   htim3.Instance->CCR3 = pulse;
@@ -334,7 +334,7 @@ static int cmd_set_freq(const struct shell *shell, size_t argc, char **argv) {
   htim1.Instance->PSC = new_psc_1;
   htim2.Instance->PSC = new_psc_2;
   htim3.Instance->PSC = new_psc_3;
-  LOG_INF("Freq %d (%d) %d (%d) %d (%d)", new_freq, new_psc_1, new_freq,
+  LOG_DBG("Freq %d (%d) %d (%d) %d (%d)", new_freq, new_psc_1, new_freq,
           new_psc_2, new_freq, new_psc_3);
   current_freq = new_freq;
   return 0;

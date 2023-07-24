@@ -3,7 +3,7 @@
 #include <zephyr/device.h>
 #include <zephyr/sys/slist.h>
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(io, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(io, LOG_LEVEL_ERR);
 
 #include "io.h"
 #include "app_event_manager.h"
@@ -275,7 +275,7 @@ int io_init(void)
 	gpio_init_callback(&ov1_int_cb, ov1_int_callback_handler, BIT(ov1_int_dt.pin));
 	gpio_add_callback(ov1_int_dt.port, &ov1_int_cb);
 
-	LOG_INF("Initialized the IO Interface successfully");
+	LOG_DBG("Initialized the IO Interface successfully");
 	return 0;
 }
 

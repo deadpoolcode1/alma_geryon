@@ -80,7 +80,7 @@ void start_pwm_pins(uint8_t *pin_gpios, uint8_t *freqs, uint8_t *duty_cycles, ui
         } else {
             k_timer_start(&pin_state->pwm_timer_high, K_MSEC(0), K_NO_WAIT);
         }
-        LOG_INF("Started PWM on pin %u with freq %u Hz and duty cycle %u%%", pin_gpio, freq, duty_cycle);
+        LOG_DBG("Started PWM on pin %u with freq %u Hz and duty cycle %u%%", pin_gpio, freq, duty_cycle);
     }
 }
 
@@ -97,6 +97,6 @@ void stop_pwm_pins(uint8_t *pin_gpios, uint8_t num_pins)
         k_timer_stop(&pin_state->pwm_timer_low);
         m_io_set(pin_state->pin_gpio, 0); // Set the PWM pin low
 
-        LOG_INF("Stopped PWM on pin %u", pin_gpio);
+        LOG_DBG("Stopped PWM on pin %u", pin_gpio);
     }
 }

@@ -2,7 +2,7 @@
 #include <zephyr/drivers/dac.h>
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(dac_alma, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(dac_alma, LOG_LEVEL_ERR);
 
 static const struct device *const dac_dev = DEVICE_DT_GET(DT_NODELABEL(dac1));
 
