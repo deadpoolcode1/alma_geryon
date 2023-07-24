@@ -310,7 +310,7 @@ static void proto_req_cmd_get_freq_handler(uint8_t *buffer, uint8_t len) {
   res_buf[offset++] = '1';
   res_buf[offset++] = 'G';
   res_buf[offset++] = 'F';
-  res_buf[offset++] = p_proto_data->freq + '0';
+  res_buf[offset++] = global_alma_data.pulse_freq + '0';
   uint8_t crc = protocol_calc_crc(res_buf, offset);
   res_buf[offset++] = (crc / 10) + '0';
   res_buf[offset++] = (crc % 10) + '0';
