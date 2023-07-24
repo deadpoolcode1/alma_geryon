@@ -41,13 +41,10 @@ static struct gpio_callback oc1_int_cb;
 static struct gpio_callback ov1_int_cb;
 
 static void global_en_callback_handler(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins) {
-
-	gpio_port_value_t value;
-	gpio_port_get_raw(port, &value);
-	struct app_event event;
-	if (value == 0) {
+	uint8_t level = gpio_pin_get_dt(&global_en_dt);
+	if (level == 0) {
 		event.type = APP_EVENT_IN_GLOBAL_EN_FALLING;
-	} else if (value == 1) {
+	} else if (level == 1) {
 		event.type = APP_EVENT_IN_GLOBAL_EN_RISING;
 	} else {
 		event.type = APP_EVENT_IN_GLOBAL_EN_FALLING;
@@ -216,7 +213,7 @@ int io_init(void)
 		return -EINVAL;
 	}
 
-    gpio_pin_configure_dt(&global_en_dt, GPIO_INPUT);
+    gpio_pin_configure_dt(&global_en_dt, GPIO_INPUT | GPIO_PULL_UP);
     gpio_pin_configure_dt(&status_out_dt, GPIO_OUTPUT);
     gpio_pin_configure_dt(&reset_int_dt, GPIO_INPUT);
     gpio_pin_configure_dt(&fan_out_dt, GPIO_OUTPUT);
