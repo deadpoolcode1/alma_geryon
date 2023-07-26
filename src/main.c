@@ -255,28 +255,28 @@ void main(void) {
       break;
     }
     case APP_EVENT_IN_OT:
-      main_close_laser_flow();
-      protop_send_error_message(OT_ERR);
+      //main_close_laser_flow();
+      //protop_send_error_message(OT_ERR);
       break;
     case APP_EVENT_IN_OC2:
-      main_close_laser_flow();
-      protop_send_error_message(OC2_ERR);
+      //main_close_laser_flow();
+      //protop_send_error_message(OC2_ERR);
       break;
     case APP_EVENT_IN_OV2:
-      main_close_laser_flow();
-      protop_send_error_message(OV2_ERR);
+      //main_close_laser_flow();
+      //protop_send_error_message(OV2_ERR);
       break;
     case APP_EVENT_IN_FLT:
-      main_close_laser_flow();
-      protop_send_error_message(FLT_ERR);
+      //main_close_laser_flow();
+      //protop_send_error_message(FLT_ERR);
       break;
     case APP_EVENT_IN_OV1:
-      main_close_laser_flow();
-      protop_send_error_message(OV1_ERR);
+      //main_close_laser_flow();
+      //protop_send_error_message(OV1_ERR);
       break;
     case APP_EVENT_IN_OC1:
-      main_close_laser_flow();
-      protop_send_error_message(OC1_ERR);
+      //main_close_laser_flow();
+      //protop_send_error_message(OC1_ERR);
       break;
     default:
       break;
