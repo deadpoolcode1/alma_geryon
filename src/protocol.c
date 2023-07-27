@@ -5,7 +5,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/printk.h>
 
-LOG_MODULE_REGISTER(geryon_uart, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(geryon_uart, LOG_LEVEL_ERR);
 
 #include "protocol.h"
 #include "main.h"

@@ -9,8 +9,7 @@
 #include<math.h>
 #include <zephyr/random/rand32.h>
 
-LOG_MODULE_REGISTER(geryon_pwm);
-
+LOG_MODULE_REGISTER(geryon_pwm, LOG_LEVEL_ERR);
 
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;

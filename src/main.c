@@ -3,7 +3,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/printk.h>
 
-LOG_MODULE_REGISTER(geryon_main, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(geryon_main, LOG_LEVEL_ERR);
 
 #include "app_event_manager.h"
 #include "cmon.h"
