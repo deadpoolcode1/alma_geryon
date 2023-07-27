@@ -377,3 +377,49 @@ int io_get(int id) {
 	}
 	return -EINVAL;
 }
+
+void io_interrupt_enable(void) {
+    gpio_pin_interrupt_configure_dt(&reset_int_dt, GPIO_INT_EDGE_RISING);
+	gpio_add_callback(reset_int_dt.port, &reset_int_cb);
+
+    gpio_pin_interrupt_configure_dt(&ot_int_dt, GPIO_INT_EDGE_RISING);
+	gpio_add_callback(ot_int_dt.port, &ot_int_cb);
+
+    gpio_pin_interrupt_configure_dt(&oc2_int_dt, GPIO_INT_EDGE_RISING);
+	gpio_add_callback(oc2_int_dt.port, &oc2_int_cb);
+
+    gpio_pin_interrupt_configure_dt(&ov2_int_dt, GPIO_INT_EDGE_RISING);
+	gpio_add_callback(ov2_int_dt.port, &ov2_int_cb);
+
+    gpio_pin_interrupt_configure_dt(&flt_int_dt, GPIO_INT_EDGE_RISING);
+	gpio_add_callback(flt_int_dt.port, &flt_int_cb);
+
+    gpio_pin_interrupt_configure_dt(&oc1_int_dt, GPIO_INT_EDGE_RISING);
+	gpio_add_callback(oc1_int_dt.port, &oc1_int_cb);
+
+    gpio_pin_interrupt_configure_dt(&ov1_int_dt, GPIO_INT_EDGE_RISING);
+	gpio_add_callback(ov1_int_dt.port, &ov1_int_cb);
+}
+
+void io_interrupt_disable(void) {
+    gpio_pin_interrupt_configure_dt(&reset_int_dt, GPIO_INT_DISABLE);
+	gpio_remove_callback(reset_int_dt.port, &reset_int_cb);
+
+    gpio_pin_interrupt_configure_dt(&ot_int_dt, GPIO_INT_DISABLE);
+	gpio_remove_callback(ot_int_dt.port, &ot_int_cb);
+
+    gpio_pin_interrupt_configure_dt(&oc2_int_dt, GPIO_INT_DISABLE);
+	gpio_remove_callback(oc2_int_dt.port, &oc2_int_cb);
+
+    gpio_pin_interrupt_configure_dt(&ov2_int_dt, GPIO_INT_DISABLE);
+	gpio_remove_callback(ov2_int_dt.port, &ov2_int_cb);
+
+    gpio_pin_interrupt_configure_dt(&flt_int_dt, GPIO_INT_DISABLE);
+	gpio_remove_callback(flt_int_dt.port, &flt_int_cb);
+
+    gpio_pin_interrupt_configure_dt(&oc1_int_dt, GPIO_INT_DISABLE);
+	gpio_remove_callback(oc1_int_dt.port, &oc1_int_cb);
+
+    gpio_pin_interrupt_configure_dt(&ov1_int_dt, GPIO_INT_DISABLE);
+	gpio_remove_callback(ov1_int_dt.port, &ov1_int_cb);
+}

@@ -3,7 +3,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/printk.h>
 
-LOG_MODULE_REGISTER(geryon_main);
+LOG_MODULE_REGISTER(geryon_main, LOG_LEVEL_DBG);
 
 #include "app_event_manager.h"
 #include "cmon.h"
@@ -19,7 +19,7 @@ struct alma_data global_alma_data = {.sync_freq = 250000,
                                      .jitter = 1,
                                      .pulse_freq = 10,
                                      .pulse_dc = {10, 10},
-                                     .op_mode = 1,
+                                     .op_mode = 4,
                                      .pulse_mode = 0};
 
 #define MAX_NUM_GPIO_PINS 4
@@ -48,7 +48,7 @@ void main_init_flow(void) {
   io_set(IO_RESET_N_OUT, 1);
   io_set(IO_STATE1_OUT, 1);
   io_set(IO_STATE2_OUT, 0);
-  io_set(IO_STATE2_OUT, 0);
+  io_set(IO_STATE3_OUT, 0);
 }
 
 void main_close_laser_flow(void) {
@@ -89,7 +89,7 @@ void main_opmode_1_flow(void) {
   start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins, -1);
   io_set(IO_STATE1_OUT, 0);
   io_set(IO_STATE2_OUT, 0);
-  io_set(IO_STATE2_OUT, 0);
+  io_set(IO_STATE3_OUT, 0);
 }
 
 void main_opmode_2_flow(void) {
@@ -112,7 +112,7 @@ void main_opmode_2_flow(void) {
   start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins, -1);
   io_set(IO_STATE1_OUT, 0);
   io_set(IO_STATE2_OUT, 0);
-  io_set(IO_STATE2_OUT, 0);
+  io_set(IO_STATE3_OUT, 0);
 }
 
 void main_opmode_3_flow(void) {
@@ -141,7 +141,7 @@ void main_opmode_3_flow(void) {
   start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins, -1);
   io_set(IO_STATE1_OUT, 0);
   io_set(IO_STATE2_OUT, 0);
-  io_set(IO_STATE2_OUT, 1);
+  io_set(IO_STATE3_OUT, 1);
 }
 
 void main_opmode_4_flow(void) {
@@ -164,16 +164,17 @@ void main_opmode_4_flow(void) {
     pin_gpios[0] = IO_PWM1_OUT;
     pin_gpios[1] = IO_PWM2_OUT;
   }
-
+  num_pins = 2;
   stop_pwm_pins(pin_gpios, num_pins);
   start_pwm_pins(pin_gpios, freqs, duty_cycles, num_pins, 1);
   io_set(IO_STATE1_OUT, 1);
   io_set(IO_STATE2_OUT, 1);
-  io_set(IO_STATE2_OUT, 0);
+  io_set(IO_STATE3_OUT, 0);
 }
 
 void main(void) {
   io_init();
+  io_interrupt_disable();
   cset_init();
   cmon_init();
   pwm_init();
@@ -203,7 +204,6 @@ void main(void) {
         main_opmode_3_flow();
       else if (global_alma_data.op_mode == 4)
         main_opmode_4_flow();
-
       break;
     }
     case APP_EVENT_IN_GLOBAL_EN_FALLING: {
@@ -220,6 +220,7 @@ void main(void) {
       break;
     }
     case APP_EVENT_IN_RESET: {
+      LOG_DBG("APP_EVENT_IN_RESET");
       io_set(IO_RESET_N_OUT, 1);
       if (global_alma_data.op_mode == 1) {
         io_set(IO_PULSE1_OUT, 1);
@@ -255,28 +256,34 @@ void main(void) {
       break;
     }
     case APP_EVENT_IN_OT:
-      //main_close_laser_flow();
-      //protop_send_error_message(OT_ERR);
+      LOG_DBG("APP_EVENT_IN_OT");
+      main_close_laser_flow();
+      protop_send_error_message(OT_ERR);
       break;
     case APP_EVENT_IN_OC2:
-      //main_close_laser_flow();
-      //protop_send_error_message(OC2_ERR);
+    LOG_DBG("APP_EVENT_IN_OC2");
+      main_close_laser_flow();
+      protop_send_error_message(OC2_ERR);
       break;
     case APP_EVENT_IN_OV2:
-      //main_close_laser_flow();
-      //protop_send_error_message(OV2_ERR);
+    LOG_DBG("APP_EVENT_IN_OV2");
+      main_close_laser_flow();
+      protop_send_error_message(OV2_ERR);
       break;
     case APP_EVENT_IN_FLT:
-      //main_close_laser_flow();
-      //protop_send_error_message(FLT_ERR);
+    LOG_DBG("APP_EVENT_IN_FLT");
+      main_close_laser_flow();
+      protop_send_error_message(FLT_ERR);
       break;
     case APP_EVENT_IN_OV1:
-      //main_close_laser_flow();
-      //protop_send_error_message(OV1_ERR);
+    LOG_DBG("APP_EVENT_IN_OV1");
+      main_close_laser_flow();
+      protop_send_error_message(OV1_ERR);
       break;
     case APP_EVENT_IN_OC1:
-      //main_close_laser_flow();
-      //protop_send_error_message(OC1_ERR);
+    LOG_DBG("APP_EVENT_IN_OC1");
+      main_close_laser_flow();
+      protop_send_error_message(OC1_ERR);
       break;
     default:
       break;

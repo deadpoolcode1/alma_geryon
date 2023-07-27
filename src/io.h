@@ -29,6 +29,8 @@ enum {
 };
 
 int io_init(void);
+void io_interrupt_enable(void);
+void io_interrupt_disable(void);
 void io_set(int id, int level);
 int io_get(int id);
 
