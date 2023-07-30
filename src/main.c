@@ -19,7 +19,7 @@ struct alma_data global_alma_data = {.sync_freq = 250000,
                                      .jitter = 1,
                                      .pulse_freq = 10,
                                      .pulse_dc = {10, 10},
-                                     .op_mode = 4,
+                                     .op_mode = 1,
                                      .pulse_mode = 0};
 
 #define MAX_NUM_GPIO_PINS 4
@@ -79,10 +79,10 @@ void main_opmode_1_flow(void) {
   num_pins = 1;
   if (global_alma_data.pulse_mode == 1) {
     io_set(IO_PWM1_OUT, 1);
-    pin_gpios[0] = CSET_CH_1;
+    pin_gpios[0] = SIGNAL_CSET_1;
   } else if (global_alma_data.pulse_mode == 0) {
     cset_out(CSET_CH_1, 128);
-    pin_gpios[0] = IO_PWM1_OUT;
+    pin_gpios[0] = SIGNAL_PWM_1;
   }
 
   stop_pwm_pins(pin_gpios, num_pins);
@@ -102,10 +102,10 @@ void main_opmode_2_flow(void) {
   num_pins = 1;
   if (global_alma_data.pulse_mode == 1) {
     io_set(IO_PWM2_OUT, 1);
-    pin_gpios[0] = CSET_CH_2;
+    pin_gpios[0] = SIGNAL_CSET_2;
   } else if (global_alma_data.pulse_mode == 0) {
     cset_out(CSET_CH_2, 128);
-    pin_gpios[0] = IO_PWM2_OUT;
+    pin_gpios[0] = SIGNAL_PWM_2;
   }
 
   stop_pwm_pins(pin_gpios, num_pins);
@@ -126,15 +126,15 @@ void main_opmode_3_flow(void) {
   duty_cycles[1] = global_alma_data.pulse_dc[1];
   num_pins = 2;
   if (global_alma_data.pulse_mode == 1) {
-    pin_gpios[0] = CSET_CH_1;
-    pin_gpios[1] = CSET_CH_2;
+    pin_gpios[0] = SIGNAL_CSET_1;
+    pin_gpios[1] = SIGNAL_CSET_2;
     io_set(IO_PWM1_OUT, 1);
     io_set(IO_PWM2_OUT, 1);
   } else if (global_alma_data.pulse_mode == 0) {
     cset_out(CSET_CH_1, 128);
     cset_out(CSET_CH_2, 128);
-    pin_gpios[0] = IO_PWM1_OUT;
-    pin_gpios[1] = IO_PWM2_OUT;
+    pin_gpios[0] = SIGNAL_PWM_1;
+    pin_gpios[1] = SIGNAL_PWM_2;
   }
 
   stop_pwm_pins(pin_gpios, num_pins);
@@ -154,15 +154,15 @@ void main_opmode_4_flow(void) {
   duty_cycles[0] = global_alma_data.pulse_dc[0];
   duty_cycles[1] = global_alma_data.pulse_dc[1];
   if (global_alma_data.pulse_mode == 1) {
-    pin_gpios[0] = CSET_CH_1;
-    pin_gpios[1] = CSET_CH_2;
+    pin_gpios[0] = SIGNAL_CSET_1;
+    pin_gpios[1] = SIGNAL_CSET_2;
     io_set(IO_PWM1_OUT, 1);
     io_set(IO_PWM2_OUT, 1);
   } else if (global_alma_data.pulse_mode == 0) {
     cset_out(CSET_CH_1, 128);
     cset_out(CSET_CH_2, 128);
-    pin_gpios[0] = IO_PWM1_OUT;
-    pin_gpios[1] = IO_PWM2_OUT;
+    pin_gpios[0] = SIGNAL_PWM_1;
+    pin_gpios[1] = SIGNAL_PWM_2;
   }
   num_pins = 2;
   stop_pwm_pins(pin_gpios, num_pins);
@@ -178,6 +178,7 @@ void main(void) {
   cset_init();
   cmon_init();
   pwm_init();
+  pwm_pins_init();
   mcp466_init();
   main_init_flow();
   protocol_init();
@@ -211,10 +212,10 @@ void main(void) {
       /* Stop pusle flow */
       pwm_stop();
       num_pins = 4;
-      pin_gpios[0] = CSET_CH_1;
-      pin_gpios[1] = CSET_CH_2;
-      pin_gpios[2] = IO_PWM1_OUT;
-      pin_gpios[3] = IO_PWM2_OUT;
+      pin_gpios[0] = SIGNAL_CSET_1;
+      pin_gpios[1] = SIGNAL_CSET_2;
+      pin_gpios[2] = SIGNAL_PWM_1;
+      pin_gpios[3] = SIGNAL_PWM_2;
       stop_pwm_pins(pin_gpios, num_pins);
       io_set(IO_RS232_EN_OUT, 0); // Enable RS232
       break;

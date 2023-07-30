@@ -349,13 +349,13 @@ static void proto_req_cmd_set_duty_handler(uint8_t *buffer, uint8_t len) {
     return;
   }
 
-  if (channel > SYNC_MAX_CH) {
+  if (channel > 2) {
     LOG_DBG("Channel is wrong %d", channel);
     return;
   }
 
-  p_proto_data->duty[channel] = duty;
-  global_alma_data.pulse_dc[channel] = duty;
+  p_proto_data->duty[channel - 1] = duty;
+  global_alma_data.pulse_dc[channel - 1] = duty;
   LOG_DBG("Duty channel %d is set %d", channel, duty);
 }
 
@@ -363,7 +363,7 @@ static void proto_req_cmd_get_duty_handler(uint8_t *buffer, uint8_t len) {
   uint8_t res_buf[128] = {0x00};
   uint8_t offset = 0;
   uint8_t channel = buffer[PROTO_SUB_CMD_CH_OFFSET] - '0';
-  uint8_t duty =  global_alma_data.pulse_dc[channel];
+  uint8_t duty =  global_alma_data.pulse_dc[channel - 1];
   res_buf[offset++] = 0x1B;
   res_buf[offset++] = '0';
   res_buf[offset++] = '0';
@@ -400,12 +400,12 @@ static void proto_req_cmd_set_current_handler(uint8_t *buffer, uint8_t len) {
     return;
   }
 
-  if (channel > SYNC_MAX_CH) {
+  if (channel > 2) {
     LOG_DBG("Channel is wrong %d", channel);
     return;
   }
 
-  p_proto_data->current[channel] = current;
+  p_proto_data->current[channel - 1] = current;
   LOG_DBG("Current channel %d is set %d", channel, current);
 }
 
@@ -413,7 +413,7 @@ static void proto_req_cmd_get_current_handler(uint8_t *buffer, uint8_t len) {
   uint8_t res_buf[128] = {0x00};
   uint8_t offset = 0;
   uint8_t channel = buffer[PROTO_SUB_CMD_CH_OFFSET] - '0';
-  uint8_t current = p_proto_data->current[channel];
+  uint8_t current = p_proto_data->current[channel - 1];
   res_buf[offset++] = 0x1B;
   res_buf[offset++] = '0';
   res_buf[offset++] = '0';
@@ -491,10 +491,11 @@ static void proto_req_cmd_set_fan_operation_handler(uint8_t *buffer,
   }
 
   p_proto_data->fan_operation = fan;
-  if (fan)
-	io_set(IO_FAN_OUT, 1);
-  else
-	io_set(IO_FAN_OUT, 0);
+  if (fan) {
+    io_set(IO_FAN_OUT, 1);
+  } else {
+    io_set(IO_FAN_OUT, 0);
+  }
   LOG_DBG("Fan operation is set %d", fan);
 }
 

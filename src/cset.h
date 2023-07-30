@@ -5,7 +5,8 @@
 
 enum {
     CSET_CH_1,
-    CSET_CH_2
+    CSET_CH_2,
+    CSET_NUM
 };
 
 void cset_init(void);

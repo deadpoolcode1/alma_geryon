@@ -4,6 +4,8 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(dac_alma, LOG_LEVEL_ERR);
 
+#include "cset.h"
+
 static const struct device *const dac_dev = DEVICE_DT_GET(DT_NODELABEL(dac1));
 
 static int last_ch_value[2] = {0, 0};
@@ -25,11 +27,13 @@ void cset_init(void) {
 		return;
 	}
 
-	int ret = dac_channel_setup(dac_dev, dac_ch_cfg);
+	for (int i = 0; i < CSET_NUM; i++) {
+		int ret = dac_channel_setup(dac_dev, &dac_ch_cfg[i]);
 
-	if (ret != 0) {
-		LOG_ERR("Setting up of DAC channel failed with code %d", ret);
-		return;
+		if (ret != 0) {
+			LOG_ERR("Setting up of DAC channel failed with code %d", ret);
+			return;
+		}
 	}
 
     LOG_INF("Setup DAC for CSET successfully");
@@ -42,6 +46,7 @@ void cset_out(int channel, int value) {
 	}
 
     last_ch_value[channel] = value;
+	
     dac_write_value(dac_dev, dac_ch_cfg[channel].channel_id, value);
 }
 
