@@ -31,29 +31,29 @@ static struct pwm_pin_state pwm_pins[SIGNAL_NUM];
 static void work_high_1_callback(struct k_work *work)
 {
     struct pwm_pin_state *pin_state = CONTAINER_OF(work, struct pwm_pin_state, work_timer_high);
-    m_io_set(pin_state->pin_gpio, 0); // Set the PWM pin low
-    k_work_schedule(&pin_state->work_timer_low, K_MSEC(pin_state->period - pin_state->pulse_width));
+    m_io_set(pin_state->pin_gpio, 1); // Set the PWM pin high
+    k_work_schedule(&pin_state->work_timer_low, K_MSEC(pin_state->pulse_width));
 }
 
 static void work_low_1_callback(struct k_work *work)
 {
     struct pwm_pin_state *pin_state = CONTAINER_OF(work, struct pwm_pin_state, work_timer_low);
-    m_io_set(pin_state->pin_gpio, 1); // Set the PWM pin high
-    k_work_schedule(&pin_state->work_timer_high, K_MSEC(pin_state->pulse_width));
+    m_io_set(pin_state->pin_gpio, 0); // Set the PWM pin low 
+    k_work_schedule(&pin_state->work_timer_high, K_MSEC(pin_state->period - pin_state->pulse_width));
 }
 
 static void work_high_2_callback(struct k_work *work)
 {
     struct pwm_pin_state *pin_state = CONTAINER_OF(work, struct pwm_pin_state, work_timer_high);
-    m_io_set(pin_state->pin_gpio, 0); // Set the PWM pin low
-    k_work_schedule(&pin_state->work_timer_low, K_MSEC(pin_state->period - pin_state->pulse_width));
+    m_io_set(pin_state->pin_gpio, 1); // Set the PWM pin high
+    k_work_schedule(&pin_state->work_timer_low, K_MSEC(pin_state->pulse_width));
 }
 
 static void work_low_2_callback(struct k_work *work)
 {
     struct pwm_pin_state *pin_state = CONTAINER_OF(work, struct pwm_pin_state, work_timer_low);
-    m_io_set(pin_state->pin_gpio, 1); // Set the PWM pin high
-    k_work_schedule(&pin_state->work_timer_high, K_MSEC(pin_state->pulse_width));
+    m_io_set(pin_state->pin_gpio, 0); // Set the PWM pin low
+    k_work_schedule(&pin_state->work_timer_high, K_MSEC(pin_state->period - pin_state->pulse_width));
 }
 
 void pwm_pins_init(void) {
@@ -106,7 +106,7 @@ void start_pwm_pins(uint8_t *pin_gpios, uint8_t *freqs, uint8_t *duty_cycles, ui
         pin_state->pulse_width = pulse_width_ms;
         LOG_DBG("%d %d", period_ms, pulse_width_ms);
 
-        m_io_set(pin_state->pin_gpio, 0); // Set the PWM pin low initially
+        m_io_set(pin_state->pin_gpio, 1); // Set the PWM pin high initially
         if (i == index_shift) {
             k_work_schedule(&pin_state->work_timer_high, K_MSEC(pin_state->period / 2 - pin_state->pulse_width / 2));
         } else {
